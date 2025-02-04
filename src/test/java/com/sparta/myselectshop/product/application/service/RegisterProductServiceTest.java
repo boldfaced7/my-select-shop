@@ -15,12 +15,12 @@ class RegisterProductServiceTest {
         var sut = new RegisterProductService(
                 product -> setId(product, ID)
         );
-        var command = new RegisterProductCommand(TITLE, IMAGE, LINK, LOWEST_PRICE);
+        var command = new RegisterProductCommand(USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE);
 
         // When
         var result = sut.registerProduct(command);
 
         // Then
-        assertAll(result, ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE);
+        assertAll(result, ID, USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE);
     }
 }

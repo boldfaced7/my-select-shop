@@ -1,6 +1,7 @@
 package com.sparta.myselectshop.product.domain;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class Product {
     public static final int MIN_MY_PRICE = 100;
 
     private final String id;
+    private final String userId;
     private final String title;
     private final String image;
     private final String link;
@@ -24,6 +26,7 @@ public class Product {
     private final LocalDateTime deletedAt;
 
     public static Product generate(
+            UserId userId,
             Title title,
             Image image,
             Link link,
@@ -31,6 +34,7 @@ public class Product {
     ) {
         return new Product(
                 null,
+                userId.value(),
                 title.value(),
                 image.value(),
                 link.value(),
@@ -44,6 +48,7 @@ public class Product {
 
     public static Product generate(
             Id id,
+            UserId userId,
             Title title,
             Image image,
             Link link,
@@ -55,6 +60,7 @@ public class Product {
     ) {
         return new Product(
                 id.value(),
+                userId.value(),
                 title.value(),
                 image.value(),
                 link.value(),
@@ -69,6 +75,7 @@ public class Product {
     public Product updateMyPrice(MyPrice toBeUpdated) {
         return new Product(
                 this.id,
+                this.userId,
                 this.title,
                 this.image,
                 this.link,
@@ -83,6 +90,7 @@ public class Product {
     public Product updateLowestPrice(LowestPrice toBeUpdated) {
         return new Product(
                 this.id,
+                this.userId,
                 this.title,
                 this.image,
                 this.link,
@@ -96,8 +104,9 @@ public class Product {
 
 
 
-    public record Id(String value) {}
-    public record Title(String value) {}
+    public record Id(@NotBlank String value) {}
+    public record UserId(@NotBlank String value) {}
+    public record Title(@NotBlank String value) {}
     public record Image(String value) {}
     public record Link(String value) {}
     public record LowestPrice(int value) {}

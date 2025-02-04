@@ -4,6 +4,6 @@ import com.sparta.myselectshop.product.domain.Product;
 
 import java.util.List;
 
-public interface FindAllProductsPort {
+public interface ListAllProductsPort {
     List<Product> findAll();
 }

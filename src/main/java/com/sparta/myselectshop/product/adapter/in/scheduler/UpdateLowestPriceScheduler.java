@@ -1,6 +1,6 @@
 package com.sparta.myselectshop.product.adapter.in.scheduler;
 
-import com.sparta.myselectshop.product.adapter.out.external.SearchLowestPriceByTitleClient;
+import com.sparta.myselectshop.product.adapter.out.external.NaverSearchApiClient;
 import com.sparta.myselectshop.product.application.port.in.ListAllProductsQuery;
 import com.sparta.myselectshop.product.application.port.in.UpdateLowestPriceCommand;
 import com.sparta.myselectshop.product.application.port.in.UpdateLowestPriceUseCase;
@@ -20,7 +20,7 @@ public class UpdateLowestPriceScheduler {
     private static final int SLEEP_DURATION_SECONDS = 1;
 
     private final ListAllProductsQuery listAllProductsQuery;
-    private final SearchLowestPriceByTitleClient searchLowestPriceByTitleClient;
+    private final NaverSearchApiClient naverSearchApiClient;
     private final UpdateLowestPriceUseCase updateLowestPriceUseCase;
 
     @Scheduled(cron = "0 0 1 * * * ")
@@ -45,12 +45,14 @@ public class UpdateLowestPriceScheduler {
     }
 
     private UpdateLowestPriceCommand searchLowestPrice(Product product) {
-        return searchLowestPriceByTitleClient
-                .searchLowestPriceByTitle(product.getTitle())
-                .map(searched -> new UpdateLowestPriceCommand(
-                        new Product.Id(product.getId()),
-                        searched
-                ))
-                .orElseThrow();
+        var found = naverSearchApiClient
+                .searchProductsByTitle(product.getTitle())
+                .get(0)
+                .getLowestPrice();
+
+        return new UpdateLowestPriceCommand(
+                new Product.Id(product.getId()),
+                new Product.LowestPrice(found)
+        );
     }
 }

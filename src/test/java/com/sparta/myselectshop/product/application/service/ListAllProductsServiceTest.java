@@ -14,13 +14,13 @@ class ListAllProductsServiceTest {
     void givenNothing_whenFetching_thenReturnsProductList() {
         // Given
         var sut = new ListAllProductsService(
-                () -> List.of(product(ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE))
+                () -> List.of(product(ID, USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE))
         );
         // When
         var results = sut.listAllProducts();
 
         // Then
         results.forEach(result -> assertAll(
-                result, ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE));
+                result, ID, USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE));
     }
 }

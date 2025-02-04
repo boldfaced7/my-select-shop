@@ -16,7 +16,7 @@ class UpdateMyPriceServiceTest {
     void givenUpdateMyPriceCommand_whenUpdating_thenReturnsUpdatedProduct() {
         // Given
         var sut = new UpdateMyPriceService(
-                id -> Optional.of(product(ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE)),
+                id -> Optional.of(product(ID, USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE)),
                 product -> product
         );
         var command = new UpdateMyPriceCommand(ID, NEW_MY_PRICE);
@@ -25,7 +25,7 @@ class UpdateMyPriceServiceTest {
         var result = sut.updateMyPrice(command);
 
         // Then
-        assertAll(result, ID, TITLE, IMAGE, LINK, LOWEST_PRICE, NEW_MY_PRICE);
+        assertAll(result, ID, USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE, NEW_MY_PRICE);
     }
 
     @DisplayName("[updateMyPrice] 존재하지 않는 제품 id를 전달하면, 예외를 던짐")
@@ -34,7 +34,7 @@ class UpdateMyPriceServiceTest {
         // Given
         var sut = new UpdateMyPriceService(
                 id -> Optional.empty(),
-                null
+                product -> product
         );
         var command = new UpdateMyPriceCommand(ID, NEW_MY_PRICE);
 

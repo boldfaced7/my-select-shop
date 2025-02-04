@@ -1,5 +1,6 @@
 package com.sparta.myselectshop.product.adapter.out.external;
 
+import com.sparta.myselectshop.product.domain.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -11,22 +12,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import static com.sparta.myselectshop.product.domain.Product.*;
 
 @Slf4j(topic = "NAVER API")
 @Component
 @RequiredArgsConstructor
-public class NaverSearchApiClient implements SearchLowestPriceByTitleClient {
+public class NaverSearchApiClient {
 
     private final RestTemplate restTemplate;
 
-    public Optional<LowestPrice> searchLowestPriceByTitle(String title) {
+    public List<Product> searchProductsByTitle(String title) {
         var uri = generateUri(title);
         var request = generateRequest(uri);
         var response = executeRequest(request);
-        return readFirstLowestPrice(response.getBody());
+        return readProducts(response.getBody());
     }
 
     private URI generateUri(String query) {
@@ -55,13 +55,23 @@ public class NaverSearchApiClient implements SearchLowestPriceByTitleClient {
         return response;
     }
 
-    private Optional<LowestPrice> readFirstLowestPrice(String json) {
+    private List<Product> readProducts(String json) {
         JSONObject jsonObject = new JSONObject(json);
         List<Object> items = jsonObject.getJSONArray("items").toList();
 
         return items.stream()
-                .findFirst()
-                .map(item -> ((JSONObject) item).getInt("lprice"))
-                .map(LowestPrice::new);
+                .map(this::readProduct)
+                .toList();
+    }
+
+    private Product readProduct(Object item) {
+        JSONObject productObject = (JSONObject) item;
+        return Product.generate(
+                new UserId(""),
+                new Title(productObject.getString("title")),
+                new Image(productObject.getString("image")),
+                new Link(productObject.getString("link")),
+                new LowestPrice(productObject.getInt("lprice"))
+        );
     }
 }
