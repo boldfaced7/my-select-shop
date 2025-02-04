@@ -1,5 +1,6 @@
 package com.sparta.myselectshop.user.domain;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -58,8 +59,8 @@ public class User {
         );
     }
 
-    public record Id(String value) {}
-    public record Username(String value) {}
-    public record Password(String value) {}
-    public record Email(String value) {}
+    public record Id(@NotBlank String value) {}
+    public record Username(@NotBlank String value) {}
+    public record Password(@NotBlank String value) {}
+    public record Email(@jakarta.validation.constraints.Email String value) {}
 }

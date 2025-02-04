@@ -4,7 +4,7 @@ import com.sparta.myselectshop.user.domain.User;
 
 import java.util.Optional;
 
-import static com.sparta.myselectshop.user.domain.User.*;
+import static com.sparta.myselectshop.user.domain.User.Username;
 
 public interface FindByUsernamePort {
     Optional<User> findByUsername(Username username);

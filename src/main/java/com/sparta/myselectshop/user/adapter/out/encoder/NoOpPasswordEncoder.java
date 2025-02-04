@@ -4,7 +4,7 @@ import com.sparta.myselectshop.user.application.port.out.EncodePasswordPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.sparta.myselectshop.user.domain.User.*;
+import static com.sparta.myselectshop.user.domain.User.Password;
 
 @Component
 @RequiredArgsConstructor

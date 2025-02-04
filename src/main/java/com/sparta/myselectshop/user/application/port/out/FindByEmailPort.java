@@ -4,7 +4,7 @@ import com.sparta.myselectshop.user.domain.User;
 
 import java.util.Optional;
 
-import static com.sparta.myselectshop.user.domain.User.*;
+import static com.sparta.myselectshop.user.domain.User.Email;
 
 public interface FindByEmailPort {
     Optional<User> findByEmail(Email email);

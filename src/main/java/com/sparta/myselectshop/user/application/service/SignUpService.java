@@ -2,7 +2,9 @@ package com.sparta.myselectshop.user.application.service;
 
 import com.sparta.myselectshop.user.application.port.in.SignUpCommand;
 import com.sparta.myselectshop.user.application.port.in.SignUpUseCase;
-import com.sparta.myselectshop.user.application.port.out.*;
+import com.sparta.myselectshop.user.application.port.out.EncodePasswordPort;
+import com.sparta.myselectshop.user.application.port.out.SaveUserPort;
+import com.sparta.myselectshop.user.application.port.out.SignUpRequestValidator;
 import com.sparta.myselectshop.user.domain.User;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.sparta.myselectshop.user.domain.User.*;
+import static com.sparta.myselectshop.user.domain.User.Password;
+import static com.sparta.myselectshop.user.domain.User.generate;
 
 @Service
 @RequiredArgsConstructor
