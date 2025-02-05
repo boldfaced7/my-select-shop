@@ -1,8 +1,6 @@
 package com.sparta.myselectshop.productfolder.application.service;
 
 import com.sparta.myselectshop.productfolder.application.port.in.AddFolderToProductCommand;
-import com.sparta.myselectshop.productfolder.application.port.out.FindFolderByIdResponse;
-import com.sparta.myselectshop.productfolder.application.port.out.FindProductByIdResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static com.sparta.myselectshop.productfolder.ProductFolderTestUtil.*;
+import static com.sparta.myselectshop.productfolder.application.port.out.FindFolderByIdPort.FolderResponse;
+import static com.sparta.myselectshop.productfolder.application.port.out.FindProductByIdPort.ProductResponse;
 
 class AddFolderToProductServiceTest {
 
@@ -18,9 +18,9 @@ class AddFolderToProductServiceTest {
     void givenAddFolderToProductCommand_whenAddFolderToProduct_thenReturnsSavedProductFolder() {
         // Given
         var sut = new AddFolderToProductService(
-                request -> Optional.of(new FindProductByIdResponse(null, USER_ID.value(), null)),
-                request -> Optional.of(new FindFolderByIdResponse(null, USER_ID.value())),
-                (productId, folderId) -> Optional.empty(),
+                request -> Optional.of(new ProductResponse(null, USER_ID, null)),
+                request -> Optional.of(new FolderResponse(null, USER_ID)),
+                (p, f) -> Optional.empty(),
                 productFolder -> setId(productFolder, ID)
         );
         var command = new AddFolderToProductCommand(USER_ID, PRODUCT_ID, FOLDER_ID);
@@ -58,7 +58,7 @@ class AddFolderToProductServiceTest {
     void givenInvalidFolderId_whenAddFolderToProduct_thenThrowsException() {
         // Given
         var sut = new AddFolderToProductService(
-                request -> Optional.of(new FindProductByIdResponse(null, USER_ID.value(), null)),
+                request -> Optional.of(new ProductResponse(null, USER_ID, null)),
                 request -> Optional.empty(),
                 null,
                 null
@@ -79,8 +79,8 @@ class AddFolderToProductServiceTest {
     void givenInvalidUserId_whenAddFolderToProduct_thenThrowsException() {
         // Given
         var sut = new AddFolderToProductService(
-                request -> Optional.of(new FindProductByIdResponse(null, USER_ID.value(), null)),
-                request -> Optional.of(new FindFolderByIdResponse(null, USER_ID.value())),
+                request -> Optional.of(new ProductResponse(null, USER_ID, null)),
+                request -> Optional.of(new FolderResponse(null, USER_ID)),
                 null,
                 null
         );
@@ -100,9 +100,9 @@ class AddFolderToProductServiceTest {
     void givenSavedProductIdAndFolderId_whenAddFolderToProduct_thenThrowsException() {
         // Given
         var sut = new AddFolderToProductService(
-                request -> Optional.of(new FindProductByIdResponse(null, USER_ID.value(), null)),
-                request -> Optional.of(new FindFolderByIdResponse(null, USER_ID.value())),
-                (productId, folderId) -> Optional.of(productFolder(ID, USER_ID, PRODUCT_ID, FOLDER_ID)),
+                request -> Optional.of(new ProductResponse(null, USER_ID, null)),
+                request -> Optional.of(new FolderResponse(null, USER_ID)),
+                (p, f) -> Optional.of(productFolder(ID, USER_ID, PRODUCT_ID, FOLDER_ID)),
                 null
         );
         var command = new AddFolderToProductCommand(USER_ID, PRODUCT_ID, FOLDER_ID);

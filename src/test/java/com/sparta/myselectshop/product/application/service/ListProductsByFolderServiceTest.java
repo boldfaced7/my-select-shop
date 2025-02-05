@@ -1,7 +1,6 @@
 package com.sparta.myselectshop.product.application.service;
 
 import com.sparta.myselectshop.product.application.port.in.ListProductsByFolderCommand;
-import com.sparta.myselectshop.product.application.port.out.ListProductsByFolderResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +8,7 @@ import java.util.List;
 
 import static com.sparta.myselectshop.MySelectShopTestUtil.*;
 import static com.sparta.myselectshop.product.ProductTestUtil.*;
+import static com.sparta.myselectshop.product.application.port.out.ListProductFoldersByFolderPort.ProductFolderResponse;
 
 class ListProductsByFolderServiceTest {
 
@@ -17,7 +17,7 @@ class ListProductsByFolderServiceTest {
     void givenListProductsByFolderCommand_whenFetchingProducts_thenReturnsListOfProducts() {
         // Given
         var sut = new ListProductsByFolderService(
-                req -> List.of(new ListProductsByFolderResponse(PRODUCT_FOLDER_ID, ID.value(), FOLDER_ID)),
+                req -> List.of(new ProductFolderResponse(PRODUCT_FOLDER_ID, ID.value(), FOLDER_ID)),
                 ids -> List.of(product(ID, USER_ID, TITLE, IMAGE, LINK, LOWEST_PRICE, MY_PRICE))
         );
         var command = new ListProductsByFolderCommand(USER_ID, FOLDER_ID, PAGE, PAGE_SIZE, SORT_BY, IS_ASC);

@@ -5,8 +5,9 @@ import com.sparta.myselectshop.folder.application.port.in.ListFoldersByUserQuery
 import com.sparta.myselectshop.folder.application.port.out.ListFoldersByUserPort;
 import com.sparta.myselectshop.folder.domain.Folder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class ListFoldersByUserService implements ListFoldersByUserQuery {
     private final ListFoldersByUserPort listFoldersByUserPort;
 
     @Override
-    public Page<Folder> listFoldersByUser(ListFoldersByUserCommand command) {
-        return listFoldersByUserPort.findByUserId(command.userId(), command.pageable());
+    public List<Folder> listFoldersByUser(ListFoldersByUserCommand command) {
+        return listFoldersByUserPort.listByUserId(command.userId());
     }
 }

@@ -4,16 +4,14 @@ import com.sparta.myselectshop.product.application.port.in.ListAllProductsQuery;
 import com.sparta.myselectshop.product.domain.Product;
 import com.sparta.myselectshop.user.adapter.in.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ListAllProductsController {
@@ -21,16 +19,13 @@ public class ListAllProductsController {
     private final ListAllProductsQuery listAllProductsQuery;
 
     @GetMapping("/admin/products")
-    public ResponseEntity<List<Response>> listAllProductsByUser(
+    public List<Response> listAllProductsByUser(
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         return listAllProductsQuery.listAllProducts()
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        ResponseEntity::ok
-                ));
+                .toList();
     }
 
     private Response toResponse(Product product) {

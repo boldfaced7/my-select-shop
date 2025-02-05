@@ -5,33 +5,31 @@ import com.sparta.myselectshop.product.application.port.in.RegisterProductUseCas
 import com.sparta.myselectshop.product.domain.Product;
 import com.sparta.myselectshop.user.adapter.in.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.sparta.myselectshop.product.domain.Product.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class RegisterProductController {
 
     private final RegisterProductUseCase registerProductUseCase;
 
     @PostMapping("/products")
-    public ResponseEntity<Response>  createProduct(
-            @RequestBody final Request request,
+    public ProductResponse  createProduct(
+            @RequestBody final ProductRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         var command = toCommand(request, userDetails);
         var registered = registerProductUseCase.registerProduct(command);
-        var response = toResponse(registered);
-        return ResponseEntity.ok(response);
+        return toResponse(registered);
     }
 
     public RegisterProductCommand toCommand(
-            Request request,
+            ProductRequest request,
             UserDetailsImpl userDetails
     ) {
         return new RegisterProductCommand(
@@ -43,8 +41,8 @@ public class RegisterProductController {
         );
     }
 
-    public Response toResponse(Product product) {
-        return new Response(
+    public ProductResponse toResponse(Product product) {
+        return new ProductResponse(
                 product.getId(),
                 product.getTitle(),
                 product.getImage(),
@@ -54,14 +52,14 @@ public class RegisterProductController {
         );
     }
 
-    public record Request(
+    public record ProductRequest(
             String title,
             String image,
             String link,
             int lowestPrice
     ) {}
 
-    public record Response(
+    public record ProductResponse(
             String id,
             String title,
             String image,

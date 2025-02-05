@@ -39,7 +39,7 @@ public class Product {
                 image.value(),
                 link.value(),
                 lowestPrice.value(),
-                null,
+                0,
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 null

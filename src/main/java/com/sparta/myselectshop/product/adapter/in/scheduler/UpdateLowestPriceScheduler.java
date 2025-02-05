@@ -48,7 +48,7 @@ public class UpdateLowestPriceScheduler {
         var found = naverSearchApiClient
                 .searchProductsByTitle(product.getTitle())
                 .get(0)
-                .getLowestPrice();
+                .lprice();
 
         return new UpdateLowestPriceCommand(
                 new Product.Id(product.getId()),

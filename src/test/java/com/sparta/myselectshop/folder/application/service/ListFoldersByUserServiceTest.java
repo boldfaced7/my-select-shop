@@ -3,11 +3,9 @@ package com.sparta.myselectshop.folder.application.service;
 import com.sparta.myselectshop.folder.application.port.in.ListFoldersByUserCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
-import static com.sparta.myselectshop.MySelectShopTestUtil.*;
 import static com.sparta.myselectshop.folder.FolderTestUtil.*;
 
 class ListFoldersByUserServiceTest {
@@ -15,11 +13,10 @@ class ListFoldersByUserServiceTest {
     @Test
     void givenAddFoldersCommand_whenFetchingFolders_thenReturnsLostOfFolders() {
         // Given
-        var dummy = List.of(folder(ID, USER_ID, NAME));
         var sut = new ListFoldersByUserService(
-                (userId, pageable) -> new PageImpl<>(dummy)
+                (userId) -> List.of(folder(ID, USER_ID, NAME))
         );
-        var command = new ListFoldersByUserCommand(USER_ID, PAGE, PAGE_SIZE, SORT_BY, IS_ASC);
+        var command = new ListFoldersByUserCommand(USER_ID);
 
         // When
         var results = sut.listFoldersByUser(command);

@@ -11,28 +11,27 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 
-@Slf4j(topic = "JwtUtil")
+@Slf4j(topic = "JwtProvider")
 @Component
-public class JwtProvider {
+public class JwtUtils {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String AUTHORIZATION_KEY = "auth";
     public static final String BEARER_PREFIX = "Bearer ";
 
-    private final JwtProperties jwtProperties;
-    private final Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    private final JwtProperties jwtProperties;
+    private Key key;
 
-    public JwtProvider(JwtProperties jwtProperties) {
+    public JwtUtils(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
-        byte[] decoded = Base64.getDecoder().decode(jwtProperties.getSecretKey());
-        key = Keys.hmacShaKeyFor(decoded);
+        byte[] bytes = Base64.getDecoder().decode(jwtProperties.getSecretKey());
+        key = Keys.hmacShaKeyFor(bytes);
     }
 
     public String generateAccessToken(String username, UserRole role) {
-        return generateToken(username, role, jwtProperties.getAccessExpiration());
+        return BEARER_PREFIX + generateToken(username, role, jwtProperties.getAccessExpiration());
     }
 
     public String generateRefreshToken(String username, UserRole role) {
@@ -42,29 +41,28 @@ public class JwtProvider {
     private String generateToken(String username, UserRole role, Long expiration) {
         Date date = new Date();
 
-        return BEARER_PREFIX + Jwts.builder()
+        return Jwts.builder()
                 .setSubject(username)
                 .claim(AUTHORIZATION_KEY, role)
-                .setIssuer(jwtProperties.getIssuer())
-                .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + expiration))
+                .setIssuedAt(date)
                 .signWith(key, signatureAlgorithm)
                 .compact();
     }
 
-    public Optional<String> extractToken(HttpServletRequest request) {
+    public String extractToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return Optional.of(bearerToken.substring(BEARER_PREFIX.length()));
+            return bearerToken.substring(7);
         }
-        return Optional.empty();
+        return null;
     }
 
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException | io.jsonwebtoken.security.SignatureException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token, 만료된 JWT token 입니다.");
@@ -76,21 +74,7 @@ public class JwtProvider {
         return false;
     }
 
-    public String getUsername(String token) {
-        Claims claims = getClaims(token);
-        return claims.getSubject();
-    }
-
-    public UserRole getRole(String token) {
-        Claims claims = getClaims(token);
-        return claims.get(AUTHORIZATION_KEY, UserRole.class);
-    }
-
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    public Claims getUserInfoFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 }

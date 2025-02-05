@@ -1,9 +1,12 @@
 package com.sparta.myselectshop.product.adapter.out.external;
 
-import com.sparta.myselectshop.product.domain.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -11,9 +14,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.sparta.myselectshop.product.domain.Product.*;
 
 @Slf4j(topic = "NAVER API")
 @Component
@@ -22,56 +24,58 @@ public class NaverSearchApiClient {
 
     private final RestTemplate restTemplate;
 
-    public List<Product> searchProductsByTitle(String title) {
-        var uri = generateUri(title);
-        var request = generateRequest(uri);
-        var response = executeRequest(request);
-        return readProducts(response.getBody());
+    @Value("${openapi.naver.client-id}")
+    private String clientId;
+    @Value("${openapi.naver.client-secret}")
+    private String clientSecret;
+
+    public static List<Item> fromJsonToItems(String responseStr) {
+        JSONArray items = new JSONObject(responseStr).getJSONArray("items");
+        List<Item> itemList = new ArrayList<>();
+        for (Object o : items) {
+            itemList.add(new Item((JSONObject) o));
+        }
+        return itemList;
     }
 
-    private URI generateUri(String query) {
-        var uri = UriComponentsBuilder
+    public List<Item> searchProductsByTitle(String query) {
+        URI uri = getUri(query);
+        RequestEntity<Void> requestEntity = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", clientId)
+                .header("X-Naver-Client-Secret", clientSecret)
+                .build();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+
+        log.info("status code : {}", responseEntity.getStatusCode());
+        return fromJsonToItems(responseEntity.getBody());
+    }
+
+    private URI getUri(String query) {
+        return UriComponentsBuilder
                 .fromUriString("https://openapi.naver.com")
                 .path("/v1/search/shop.json")
-                .queryParam("dispaly", 15)
+                .queryParam("display", 15)
                 .queryParam("query", query)
                 .encode()
                 .build()
                 .toUri();
-        log.info("uri = " + uri);
-        return uri;
     }
 
-    private RequestEntity<Void> generateRequest(URI uri) {
-        return RequestEntity.get(uri)
-                .header("X-Naver-Client-Id", "{Client-Id}")
-                .header("X-Naver-Client-Secret", "{Client-Secret}")
-                .build();
-    }
 
-    private ResponseEntity<String> executeRequest(RequestEntity<Void> request) {
-        var response = restTemplate.exchange(request, String.class);
-        log.info("NAVER API Status Code : " + response.getStatusCode());
-        return response;
-    }
-
-    private List<Product> readProducts(String json) {
-        JSONObject jsonObject = new JSONObject(json);
-        List<Object> items = jsonObject.getJSONArray("items").toList();
-
-        return items.stream()
-                .map(this::readProduct)
-                .toList();
-    }
-
-    private Product readProduct(Object item) {
-        JSONObject productObject = (JSONObject) item;
-        return Product.generate(
-                new UserId(""),
-                new Title(productObject.getString("title")),
-                new Image(productObject.getString("image")),
-                new Link(productObject.getString("link")),
-                new LowestPrice(productObject.getInt("lprice"))
-        );
+    public record Item(
+            @NotBlank String title,
+            @NotBlank String link,
+            @NotBlank String image,
+            @NotNull int lprice
+    ) {
+        public Item(JSONObject object) {
+            this(
+                    object.getString("title"),
+                    object.getString("link"),
+                    object.getString("image"),
+                    object.getInt("lprice")
+            );
+        }
     }
 }

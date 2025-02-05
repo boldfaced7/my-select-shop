@@ -20,11 +20,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
     private final JwtProperties jwtProperties;
-    private final JwtProvider jwtProvider;
+    private final JwtUtils jwtUtils;
 
-    public JwtAuthenticationFilter(JwtProperties jwtProperties, JwtProvider jwtProvider) {
+    public JwtAuthenticationFilter(JwtProperties jwtProperties, JwtUtils jwtUtils) {
         this.jwtProperties = jwtProperties;
-        this.jwtProvider = jwtProvider;
+        this.jwtUtils = jwtUtils;
         setFilterProcessesUrl("/api/user/login");
     }
 
@@ -33,6 +33,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             HttpServletRequest request,
             HttpServletResponse response
     ) throws AuthenticationException {
+
         var loginRequest = readLoginRequest(request);
         var token = new UsernamePasswordAuthenticationToken(
                 loginRequest.username(),
@@ -49,11 +50,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             FilterChain chain,
             Authentication authResult
     ) throws IOException, ServletException {
+        log.info("successfulAuthentication : {}", authResult);
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
-
         registerAccessToken(response, username, role);
-        registerRefreshToken(request, response, username, role);
+        // registerRefreshToken(request, response, username, role);
     }
 
     private void registerAccessToken(
@@ -61,8 +62,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             String username,
             UserRole role
     ) {
-        var generated = jwtProvider.generateAccessToken(username, role);
-        response.addHeader(JwtProvider.AUTHORIZATION_HEADER, generated);
+        var generated = jwtUtils.generateAccessToken(username, role);
+        response.addHeader(JwtUtils.AUTHORIZATION_HEADER, generated);
     }
 
     private void registerRefreshToken(
@@ -72,7 +73,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UserRole role
     ) {
         var maxAge = (int) jwtProperties.getRefreshExpiration();
-        var generated = jwtProvider.generateRefreshToken(username, role);
+        var generated = jwtUtils.generateRefreshToken(username, role);
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
         CookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, generated, maxAge);
     }

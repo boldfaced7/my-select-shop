@@ -1,7 +1,6 @@
 package com.sparta.myselectshop.product.adapter.in.web;
 
 import com.sparta.myselectshop.product.adapter.out.external.NaverSearchApiClient;
-import com.sparta.myselectshop.product.domain.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,12 +25,12 @@ public class NaverApiController {
                 .toList();
     }
 
-    private Response toResponse(Product product) {
+    private Response toResponse(NaverSearchApiClient.Item item) {
         return new Response(
-                product.getTitle(),
-                product.getLink(),
-                product.getImage(),
-                product.getLowestPrice()
+                item.title(),
+                item.link(),
+                item.image(),
+                item.lprice()
         );
     }
 

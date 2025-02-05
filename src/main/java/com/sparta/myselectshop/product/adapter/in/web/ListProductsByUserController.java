@@ -6,16 +6,15 @@ import com.sparta.myselectshop.product.domain.Product;
 import com.sparta.myselectshop.user.adapter.in.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.sparta.myselectshop.product.domain.Product.UserId;
 
-@Controller
+@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ListProductsByUserController {
@@ -23,19 +22,18 @@ public class ListProductsByUserController {
     private final ListProductsByUserQuery listProductsByUserQuery;
 
     @GetMapping("/products")
-    public ResponseEntity<Page<Response>> listPagedProductsByUser(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
+    public Page<Response> listPagedProductsByUser(
+            @RequestParam(name = "page", defaultValue = "1", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
             @RequestParam("sortBy") String sortBy,
-            @RequestParam("isAsc") boolean isAsc
+            @RequestParam("isAsc") boolean isAsc,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         var command = toCommand(userDetails, page, size, sortBy, isAsc);
-        var responses = listProductsByUserQuery
+        return listProductsByUserQuery
                 .listProductsByUser(command)
                 .map(this::toResponse);
 
-        return ResponseEntity.ok(responses);
     }
 
     private ListProductsByUserCommand toCommand(

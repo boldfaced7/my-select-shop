@@ -25,7 +25,7 @@ public class AddFoldersController {
 
     @PostMapping("/folders")
     public void addFolders(
-            @RequestBody Request request,
+            @RequestBody FolderNamesRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         var command = toCommand(userDetails.getUserId(), request.folderNames());
@@ -41,7 +41,7 @@ public class AddFoldersController {
                 ));
     }
 
-    public record Request(
+    public record FolderNamesRequest(
             List<String> folderNames
     ) {}
 }

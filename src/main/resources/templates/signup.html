@@ -2,11 +2,11 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
     <meta charset="UTF-8">
     <title>회원가입 페이지</title>
     <script>
@@ -17,7 +17,7 @@
             var box = document.getElementById("admin-token");
 
             // If the checkbox is checked, display the output text
-            if (checkBox.checked == true){
+            if (checkBox.checked == true) {
                 box.style.display = "block";
             } else {
                 box.style.display = "none";
@@ -31,17 +31,18 @@
 
     <form action="/api/user/signup" method="post">
         <div class="login-id-label">Username</div>
-        <input type="text" name="username" placeholder="Username" class="login-input-box">
+        <input class="login-input-box" name="username" placeholder="Username" type="text">
 
         <div class="login-id-label">Password</div>
-        <input type="password" name="password" class="login-input-box">
+        <input class="login-input-box" name="password" type="password">
 
         <div class="login-id-label">E-mail</div>
-        <input type="text" name="email" placeholder="E-mail" class="login-input-box">
+        <input class="login-input-box" name="email" placeholder="E-mail" type="text">
 
         <div>
-            <input id="admin-check" type="checkbox" name="admin" onclick="onclickAdmin()" style="margin-top: 40px;">관리자
-            <input id="admin-token" type="password" name="adminToken" placeholder="관리자 암호" class="login-input-box" style="display:none">
+            <input id="admin-check" name="admin" onclick="onclickAdmin()" style="margin-top: 40px;" type="checkbox">관리자
+            <input class="login-input-box" id="admin-token" name="adminToken" placeholder="관리자 암호" style="display:none"
+                   type="password">
         </div>
         <button id="login-id-submit">회원 가입</button>
     </form>

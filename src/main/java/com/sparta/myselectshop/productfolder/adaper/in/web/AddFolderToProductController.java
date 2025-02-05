@@ -4,7 +4,6 @@ import com.sparta.myselectshop.productfolder.application.port.in.AddFolderToProd
 import com.sparta.myselectshop.productfolder.application.port.in.AddFolderToProductUseCase;
 import com.sparta.myselectshop.user.adapter.in.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,19 +12,18 @@ import static com.sparta.myselectshop.productfolder.domain.ProductFolder.*;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class AddFolderToProductClass {
+public class AddFolderToProductController {
 
     private final AddFolderToProductUseCase addFolderToProductUseCase;
 
     @PostMapping("/products/{productId}/folder")
-    public ResponseEntity<Void> addFolder(
+    public void addFolder(
             @PathVariable String productId,
             @RequestParam String folderId,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         var command = toCommand(userDetails.getUserId(), productId, folderId);
         addFolderToProductUseCase.addFolderToProduct(command);
-        return ResponseEntity.ok().build();
     }
 
     private AddFolderToProductCommand toCommand(
